@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AutoMihoyoBBS验证码</title>
+    <style>
+        body {
+            margin: 50px 0;
+            text-align: center;
+            font-family: "PingFangSC-Regular", "Open Sans", Arial, "Hiragino Sans GB", "Microsoft YaHei", "STHeiti", "WenQuanYi Micro Hei", SimSun, sans-serif;
+        }
+
+        .inp {
+            border: 1px solid #cccccc;
+            border-radius: 2px;
+            padding: 0 10px;
+            width: 278px;
+            height: 40px;
+            font-size: 18px;
+        }
+
+        .btn {
+            border: 1px solid #cccccc;
+            border-radius: 2px;
+            width: 100px;
+            height: 40px;
+            font-size: 16px;
+            color: #666;
+            cursor: pointer;
+            background: white linear-gradient(180deg, #ffffff 0%, #f3f3f3 100%);
+        }
+
+        .btn:hover {
+            background: white linear-gradient(0deg, #ffffff 0%, #f3f3f3 100%)
+        }
+
+        #captcha {
+            width: 300px;
+            display: inline-block;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        #notice {
+            color: red;
+        }
+
+        label {
+            vertical-align: top;
+            display: inline-block;
+            width: 80px;
+            text-align: right;
+        }
+
+        #wait {
+            text-align: left;
+            color: #666;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <label>完成验证：</label>
+    <div id="captcha">
+        <p id="wait" class="show">正在加载验证码......</p>
+    </div>
+</div>
+<!-- 引入 极验官方gt.js，使用其中提供的 initGeetest 初始化函数 -->
+<script src="https://static.geetest.com/static/js/gt.0.4.9.js"></script>
+<script>
+    var handler = function (captchaObj) {
+        captchaObj.appendTo("#captcha");
+        captchaObj.onReady(function () {
+            document.getElementById("wait").style.display='none';
+        });
+        console.warn(1)
+        //拿到验证完的返回之后送回后端
+        captchaObj.onSuccess(function (){
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "complete", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    alert("验证完成!请返回AutoMihoyoBBS。本页面即将关闭")
+                    window.close()
+                }
+            };
+            xhr.send(JSON.stringify(captchaObj.getValidate()));
+            console.warn(2)
+        })
+
+    };
+    //从后端获取challenge并初始化验证码区域
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "getChallenge", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var dataObj = JSON.parse(xhr.responseText);
+            initGeetest({
+                gt: dataObj.gt,
+                challenge: dataObj.challenge,
+                new_captcha:true, 
+                offline: false, 
+                product: "float",
+                width: "100%"
+            }, handler);
+        }
+    };
+    xhr.send("");
+</script>
+</body>
+</html>
