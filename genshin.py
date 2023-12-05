@@ -50,7 +50,6 @@ class Genshin:
         for i in range(4):
             if i != 0:
                 log.info(f'触发验证码，即将进行第{i}次重试，最多3次')
-            print(self.headers)
             req = http.post(setting.genshin_Signurl, headers=self.headers,
                             json={'act_id': setting.genshin_Act_id, 'region': account[2], 'uid': account[1]})
             if req.status_code == 429:

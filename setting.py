@@ -126,7 +126,7 @@ honkai2_Is_signurl = web_api + "/event/luna/info?lang=zh-cn&act_id={}&region={}&
 honkai2_Sign_url = web_api + "/event/luna/sign"
 
 # 崩坏3自动签到相关的设置
-honkai3rd_Act_id = "e202311201442471"
+honkai3rd_Act_id = "e202207181446311"
 honkai3rd_checkin_rewards = f'{web_api}/event/luna/home?lang=zh-cn&act_id={honkai3rd_Act_id}'
 honkai3rd_Is_signurl = web_api + "/event/luna/info?lang=zh-cn&act_id={}&region={}&uid={}"
 honkai3rd_Sign_url = web_api + "/event/luna/sign"
