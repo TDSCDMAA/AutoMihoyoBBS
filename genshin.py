@@ -13,10 +13,10 @@ from account import get_account_list
 class Genshin:
     def __init__(self) -> None:
         self.headers = {}
-        self.headers.update(setting.headers)
+        self.headers.update(setting.headersys)
         self.headers['DS'] = tools.get_ds(web=True)
-        self.headers['Referer'] = 'https://webstatic.mihoyo.com/bbs/event/signin-ys/index.html?bbs_auth_required=true' \
-                                  f'&act_id={setting.genshin_Act_id}&utm_source=bbs&utm_medium=mys&utm_campaign=icon'
+        self.headers['Referer'] = "https://act.mihoyo.com/"
+        self.headers['Origin'] = "https://act.mihoyo.com"
         self.headers['Cookie'] = config.config["account"]["cookie"]
         self.headers['x-rpc-device_id'] = tools.get_device_id()
         self.headers['User-Agent'] = tools.get_useragent()
@@ -47,12 +47,10 @@ class Genshin:
         return data["data"]
 
     def check_in(self, account):
-        header = {}
-        header.update(self.headers)
         for i in range(4):
             if i != 0:
                 log.info(f'触发验证码，即将进行第{i}次重试，最多3次')
-            req = http.post(url=setting.genshin_Signurl, headers=header,
+            req = http.post(setting.genshin_Signurl, headers=self.headers,
                             json={'act_id': setting.genshin_Act_id, 'region': account[2], 'uid': account[1]})
             if req.status_code == 429:
                 time.sleep(10)  # 429同ip请求次数过多，尝试sleep10s进行解决
@@ -62,9 +60,9 @@ class Genshin:
             if data["retcode"] == 0 and data["data"]["success"] == 1:
                 validate = captcha.game_captcha(data["data"]["gt"], data["data"]["challenge"])
                 if validate is not None:
-                    header["x-rpc-challenge"] = data["data"]["challenge"]
-                    header["x-rpc-validate"] = validate
-                    header["x-rpc-seccode"] = f'{validate}|jordan'
+                    self.header["x-rpc-challenge"] = data["data"]["challenge"]
+                    self.header["x-rpc-validate"] = validate
+                    self.header["x-rpc-seccode"] = f'{validate}|jordan'
                 time.sleep(random.randint(6, 15))
             else:
                 break
@@ -80,33 +78,30 @@ class Genshin:
                 log.info(f"正在为旅行者{i[0]}进行签到...")
                 time.sleep(random.randint(2, 8))
                 is_data = self.is_sign(region=i[2], uid=i[1])
-                if is_data["first_bind"]:
-                    log.warning(f"旅行者{i[0]}是第一次绑定米游社，请先手动签到一次")
+                sign_days = is_data["total_sign_day"] - 1
+                ok = True
+                if is_data["is_sign"]:
+                    log.info(f"旅行者{i[0]}今天已经签到过了~\r\n今天获得的奖励是{tools.get_item(self.checkin_rewards[sign_days])}")
+                    sign_days += 1
                 else:
-                    sign_days = is_data["total_sign_day"] - 1
-                    ok = True
-                    if is_data["is_sign"]:
-                        log.info(f"旅行者{i[0]}今天已经签到过了~\r\n今天获得的奖励是{tools.get_item(self.checkin_rewards[sign_days])}")
-                        sign_days += 1
-                    else:
-                        time.sleep(random.randint(2, 8))
-                        req = self.check_in(i)
-                        if req.status_code != 429:
-                            data = req.json()
-                            if data["retcode"] == 0 and data["data"]["success"] == 0:
-                                log.info(f"旅行者{i[0]}签到成功~\r\n今天获得的奖励是"
-                                         f"{tools.get_item(self.checkin_rewards[0 if sign_days == 0 else sign_days + 1])}")
-                                sign_days += 2
-                            elif data["retcode"] == -5003:
-                                log.info(
-                                    f"旅行者{i[0]}今天已经签到过了~\r\n今天获得的奖励是{tools.get_item(self.checkin_rewards[sign_days])}")
-                            else:
-                                s = "账号签到失败！"
-                                if data["data"] != "" and data.get("data").get("success", -1):
-                                    s += "原因: 验证码\njson信息:" + req.text
-                                log.warning(s)
-                                ok = False
+                    time.sleep(random.randint(2, 8))
+                    req = self.check_in(i)
+                    if req.status_code != 429:
+                        data = req.json()
+                        if data["retcode"] == 0 and data["data"]["success"] == 0:
+                            log.info(f"旅行者{i[0]}签到成功~\r\n今天获得的奖励是"
+                                     f"{tools.get_item(self.checkin_rewards[0 if sign_days == 0 else sign_days + 1])}")
+                            sign_days += 2
+                        elif data["retcode"] == -5003:
+                            log.info(
+                                f"旅行者{i[0]}今天已经签到过了~\r\n今天获得的奖励是{tools.get_item(self.checkin_rewards[sign_days])}")
                         else:
+                            s = "账号签到失败！"
+                            if data["data"] != "" and data.get("data").get("success", -1):
+                                s += "原因: 验证码\njson信息:" + req.text
+                            log.warning(s)
+                            ok = False
+                    else:
                             ok = False
                             data = {}
                     if ok:
