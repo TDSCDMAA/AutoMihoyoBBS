@@ -60,9 +60,9 @@ class Genshin:
             if data["retcode"] == 0 and data["data"]["success"] == 1:
                 validate = captcha.game_captcha(data["data"]["gt"], data["data"]["challenge"])
                 if validate is not None:
-                    self.header["x-rpc-challenge"] = data["data"]["challenge"]
-                    self.header["x-rpc-validate"] = validate
-                    self.header["x-rpc-seccode"] = f'{validate}|jordan'
+                    self.headers["x-rpc-challenge"] = data["data"]["challenge"]
+                    self.headers["x-rpc-validate"] = validate
+                    self.headers["x-rpc-seccode"] = f'{validate}|jordan'
                 time.sleep(random.randint(6, 15))
             else:
                 break
