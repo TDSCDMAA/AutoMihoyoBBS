@@ -83,6 +83,25 @@ headers = {
     'x-rpc-device_id': ""
 }
 
+
+headersys = {
+    'Accept': 'application/json, text/plain, */*',
+    'DS': "",
+    "x-rpc-signgame": "hk4e" ,
+    "x-rpc-channel": "miyousheluodi",
+    'Origin': "https://act.mihoyo.com",
+    'Referer' :"https://act.mihoyo.com/",
+    'x-rpc-app_version': mihoyobbs_version,
+    'User-Agent': 'Mozilla/5.0 (Linux; Android 12; Unspecified Device) AppleWebKit/537.36 (KHTML, like Gecko) '
+                  f'Version/4.0 Chrome/103.0.5060.129 Mobile Safari/537.36 miHoYoBBS/{mihoyobbs_version}',
+    'x-rpc-client_type': mihoyobbs_Client_type_web,
+    'Referer': '',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Language': 'zh-CN,en-US;q=0.8',
+    'X-Requested-With': 'com.mihoyo.hyperion',
+    "Cookie": "",
+    'x-rpc-device_id': ""
+}
 # 通用设置
 bbs_api = "https://bbs-api.mihoyo.com"
 web_api = "https://api-takumi.mihoyo.com"
@@ -119,10 +138,10 @@ tearsofthemis_Is_signurl = honkai2_Is_signurl
 tearsofthemis_Sign_url = honkai2_Sign_url  # 和二崩完全一致
 
 # 原神自动签到相关的设置
-genshin_Act_id = "e202009291139501"
-genshin_checkin_rewards = f'{web_api}/event/bbs_sign_reward/home?act_id={genshin_Act_id}'
-genshin_Is_signurl = web_api + "/event/bbs_sign_reward/info?act_id={}&region={}&uid={}"
-genshin_Signurl = web_api + "/event/bbs_sign_reward/sign"
+genshin_Act_id = "e202311201442471"
+genshin_checkin_rewards =  f'{web_api}/event/luna/home?lang=zh-cn&act_id={genshin_Act_id}'
+genshin_Is_signurl = web_api + "/event/luna/info?lang=zh-cn&act_id={}&region={}&uid={}"
+genshin_Signurl = web_api + "/event/luna/sign"
 
 # 云原神相关api
 cloud_genshin_Api = "https://api-cloudgame.mihoyo.com"
